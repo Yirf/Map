@@ -50,13 +50,12 @@ public class LocalGameMap implements GameMap {
                     new WorldCreator(activeWorldFolder.getName())
             );
         } catch (Exception e) {
+            Bukkit.getLogger().severe("Unable to create world");
             e.printStackTrace();
+            return false;
         }
 
-        if (bukkitWorld == null) {
-            Bukkit.getLogger().severe("Failed to create world from: " + activeWorldFolder.getName());
-            return false;
-        } else {
+        if (bukkitWorld != null) {
             this.bukkitWorld.setAutoSave(false);
         }
         return isLoaded();
