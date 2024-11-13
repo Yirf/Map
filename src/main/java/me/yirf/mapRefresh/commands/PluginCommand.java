@@ -40,10 +40,6 @@ public class PluginCommand implements CommandExecutor {
                 p.teleport(map.getWorld().getSpawnLocation());
                 return true;
             case "unload":
-                if (!map.isLoaded()) {
-                    p.teleport(map.getWorld().getSpawnLocation());
-                    return true;
-                }
                 map.unload();
                 p.teleport(Bukkit.getWorld("world").getSpawnLocation());
                 return true;
