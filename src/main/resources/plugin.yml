@@ -3,6 +3,9 @@ version: '1.0'
 main: me.yirf.mapRefresh.MapRefresh
 api-version: '1.20'
 authors: [ Yirf ]
+load: POSTWORLD
 commands:
-  maprefresh:
+  map:
     description: main command for map plugin.
+  spawn:
+    description: the servers spawn

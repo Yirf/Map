@@ -1,9 +1,13 @@
 package me.yirf.mapRefresh.map;
 
 import me.yirf.mapRefresh.utils.FileUtil;
+import me.yirf.mapRefresh.utils.WorldUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 
@@ -60,7 +64,7 @@ public class LocalGameMap implements GameMap {
 
     @Override
     public void unload() {
-        if (bukkitWorld != null) Bukkit.unloadWorld(bukkitWorld, false);
+        WorldUtil.unloadWorld(bukkitWorld);
         if (activeWorldFolder != null) FileUtil.delete(activeWorldFolder);
 
         bukkitWorld = null;
@@ -74,11 +78,10 @@ public class LocalGameMap implements GameMap {
     }
 
     @Override
-    public boolean isLoaded() { return getWorld() != null;
-    }
+    public boolean isLoaded() { return getWorld() != null;}
 
     @Override
-    public World getWorld() {
-        return this.bukkitWorld;
+    public @Nullable World getWorld() {
+        return bukkitWorld;
     }
 }
