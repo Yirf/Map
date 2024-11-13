@@ -1,0 +1,8 @@
+name: MapRefresh
+version: '1.0'
+main: me.yirf.mapRefresh.MapRefresh
+api-version: '1.20'
+authors: [ Yirf ]
+commands:
+  maprefresh:
+    description: main command for map plugin.
