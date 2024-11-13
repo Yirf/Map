@@ -55,9 +55,9 @@ public class LocalGameMap implements GameMap {
             return false;
         }
 
-        if (bukkitWorld != null) {
-            this.bukkitWorld.setAutoSave(false);
-        }
+
+        this.bukkitWorld.setAutoSave(false);
+
         return isLoaded();
     }
 
