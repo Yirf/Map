@@ -1,5 +1,6 @@
 package me.yirf.mapRefresh;
 
+import me.yirf.mapRefresh.Listener.PlayerJoin;
 import me.yirf.mapRefresh.commands.PluginCommand;
 import me.yirf.mapRefresh.commands.SpawnCommand;
 import me.yirf.mapRefresh.commands.completions.PluginCompletion;
@@ -7,9 +8,11 @@ import me.yirf.mapRefresh.map.GameMap;
 import me.yirf.mapRefresh.map.LocalGameMap;
 import me.yirf.mapRefresh.utils.ConfigUtil;
 import me.yirf.mapRefresh.utils.TimeUtil;
+import me.yirf.mapRefresh.utils.WorldUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -29,6 +32,7 @@ public final class MapRefresh extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
+        WorldUtil.loadWorld(getConfig().getString("spawn.world"));
         spawnLocation = ConfigUtil.getLocation(getConfig(), "spawn");
         getDataFolder().mkdirs();
 
@@ -37,15 +41,21 @@ public final class MapRefresh extends JavaPlugin {
             gameMapsFolder.mkdirs();
         }
 
-        for (String name : getConfig().getStringList("enabled")) {
-            GameMap map = new LocalGameMap(gameMapsFolder, name, true);
-            maps.put(name, map);
+        ConfigurationSection enabledSection = getConfig().getConfigurationSection("enabled");
+        if (enabledSection != null) {
+            for (String key : enabledSection.getKeys(false)) {
+
+                GameMap map = new LocalGameMap(gameMapsFolder, key, getConfig(), true);
+                maps.put(key, map);
+            }
+        } else {
+            Bukkit.broadcastMessage("No 'enabled' section found in the configuration.");
         }
-        //map = new LocalGameMap(gameMapsFolder, "Map1", true);
 
         getCommand("map").setExecutor(new PluginCommand(maps));
         getCommand("map").setTabCompleter(new PluginCompletion(this));
         getCommand("spawn").setExecutor(new SpawnCommand());
+        getServer().getPluginManager().registerEvents(new PlayerJoin(), this);
 
         new MapExpansion(getConfig().getString("placeholders.prefix")).register();
 
@@ -82,5 +92,13 @@ public final class MapRefresh extends JavaPlugin {
 
             }
         }, 0L, 20L);
+    }
+
+    public Map<String, GameMap> getMaps() {
+        return maps;
+    }
+
+    public Location getSpawn() {
+        return spawnLocation;
     }
 }

@@ -4,6 +4,7 @@ import me.yirf.mapRefresh.MapRefresh;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 
 public class WorldUtil {
@@ -12,7 +13,7 @@ public class WorldUtil {
 
         for (Player player : world.getPlayers()) {
             player.teleport(MapRefresh.spawnLocation);
-            player.sendMessage(ChatColor.GREEN + "Map is reseting...");
+            player.sendMessage(ChatColor.GREEN + "All maps are now resetting!");
         }
 
         boolean success = Bukkit.getServer().unloadWorld(world, false);
@@ -20,5 +21,17 @@ public class WorldUtil {
 
         return success;
 
+    }
+
+    public static World loadWorld(String worldName) {
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            return world;
+        }
+
+        WorldCreator worldCreator = new WorldCreator(worldName);
+        world = worldCreator.createWorld();
+
+        return world;
     }
 }

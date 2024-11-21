@@ -1,11 +1,10 @@
 package me.yirf.mapRefresh.map;
 
+import me.yirf.mapRefresh.utils.ConfigUtil;
 import me.yirf.mapRefresh.utils.FileUtil;
 import me.yirf.mapRefresh.utils.WorldUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -13,16 +12,19 @@ import java.io.IOException;
 
 public class LocalGameMap implements GameMap {
     private final File sourceWorldFolder;
+    private final FileConfiguration config;
     private File activeWorldFolder;
 
     private World bukkitWorld;
+    private Location spawn;
 
-    public LocalGameMap(File worldFolder, String worldName, boolean loadOnInit) {
+    public LocalGameMap(File worldFolder, String worldName, FileConfiguration config, boolean loadOnInit) {
         this.sourceWorldFolder = new File(
                 worldFolder,
                 worldName
         );
 
+        this.config = config;
         if (loadOnInit) load();
     }
 
@@ -50,13 +52,19 @@ public class LocalGameMap implements GameMap {
                     new WorldCreator(activeWorldFolder.getName())
             );
         } catch (Exception e) {
-            Bukkit.getLogger().severe("Unable to create world");
             e.printStackTrace();
-            return false;
         }
 
-
-        this.bukkitWorld.setAutoSave(false);
+        if (bukkitWorld == null) {
+            Bukkit.getLogger().severe("Failed to create world from: " + activeWorldFolder.getName());
+            return false;
+        } else {
+            this.bukkitWorld.setAutoSave(false);
+            bukkitWorld.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+            bukkitWorld.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+        }
+        Location spwn = ConfigUtil.getLocation(config, "enabled." + sourceWorldFolder.getName() + ".spawn");
+        this.spawn = new Location(this.bukkitWorld, spwn.x(), spwn.y(), spwn.z(), spwn.getYaw(), spwn.getPitch());
 
         return isLoaded();
     }
@@ -82,5 +90,10 @@ public class LocalGameMap implements GameMap {
     @Override
     public @Nullable World getWorld() {
         return bukkitWorld;
+    }
+
+    @Override
+    public Location spawn() {
+        return spawn;
     }
 }
